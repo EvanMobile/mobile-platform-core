@@ -31,6 +31,11 @@ modules.xml
 workspace.xml
 shelf/
 assetWizardSettings.xml
+gradle.xml
+project-template.xml
+navEditor.xml
+# Ignore all .idea/ subdirectories/files not explicitly allowed if needed,
+# but currently we ignore the whole folder.
 
 # Keystore files
 *.jks
@@ -56,7 +61,6 @@ vendor/bundle/
 .packages
 .pub-cache/
 .pub/
-/build/
 flutter_*.log
 generated_plugin_registrants.kt
 

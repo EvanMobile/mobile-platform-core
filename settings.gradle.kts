@@ -1,12 +1,6 @@
 pluginManagement {
     repositories {
-        google {
-            content {
-                includeGroupByRegex("com\\.android.*")
-                includeGroupByRegex("com\\.google.*")
-                includeGroupByRegex("androidx.*")
-            }
-        }
+        google()
         mavenCentral()
         gradlePluginPortal()
     }
@@ -16,13 +10,16 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven { url = uri("https://dl.cloudsmith.io/public/consensys/maven/maven/") }
     }
 }
 
 rootProject.name = "mobile-platform-core"
 
 include(":app")
+include(":core:common")
 include(":core:state")
-include(":core:services:network")
-include(":core:services:security")
-include(":core:services:web3")
+include(":core:network")
+include(":core:security")
+include(":core:webview")
+include(":core:web3")
