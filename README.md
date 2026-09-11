@@ -103,6 +103,7 @@ For release builds, the JavaScript bundle is packaged with the application and M
 - [x] React Native project
 - [x] React Native development environment
 - [x] React Native UI running on Android
+- [x] Native ↔ React Native bridge (Legacy)
 
 ### In Progress / Planned
 
@@ -111,7 +112,6 @@ For release builds, the JavaScript bundle is packaged with the application and M
 - [ ] `core:web3` implementation
 - [ ] Solana Mobile Wallet Adapter integration
 - [ ] EVM integration with web3j
-- [ ] Native ↔ React Native bridge
 - [ ] Wallet connection and transaction flows
 - [ ] Security-focused mobile capabilities
 - [ ] End-to-end Web3 mobile demonstration
