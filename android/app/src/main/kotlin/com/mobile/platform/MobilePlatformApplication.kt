@@ -10,13 +10,17 @@ import com.facebook.react.defaults.DefaultReactHost
 import com.facebook.react.defaults.DefaultReactNativeHost
 import com.facebook.react.config.ReactFeatureFlags
 import com.facebook.soloader.SoLoader
+import com.mobile.platform.bridge.AppBridgePackage
 
 class MobilePlatformApplication : Application(), ReactApplication {
 
     override val reactNativeHost: ReactNativeHost =
         object : DefaultReactNativeHost(this) {
             override fun getPackages(): List<ReactPackage> =
-                listOf(MainReactPackage())
+                listOf(
+                    MainReactPackage(),
+                    AppBridgePackage()
+                )
 
             override fun getJSMainModuleName(): String = "index"
 
