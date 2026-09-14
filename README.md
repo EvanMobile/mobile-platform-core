@@ -64,6 +64,60 @@ The Android project is organized into independent core modules:
 
 The core modules currently establish **boundaries rather than complete feature implementations**. Functionality will be added incrementally as the project develops.
 
+## Architecture Boundary
+
+The project strictly separates cross-platform product experience from platform-specific capabilities to prevent duplicated UI implementations and establish clear architectural rules for future development.
+
+### Layer Responsibilities
+
+| React Native / Experience Layer | Native / Platform Layer |
+|---|---|
+| Wallet UI | Solana Mobile Wallet Adapter |
+| Asset and token lists | Android Keystore |
+| Transaction history | Biometric authentication |
+| Send / Receive UI | Secure storage |
+| Network selection UI | Transaction signing |
+| Wallet state presentation | Web3j / EVM integration |
+| Settings and application flows | RPC and network infrastructure |
+| Navigation and design system | Native SDK integrations |
+| Loading / error / empty states | Android lifecycle and platform APIs |
+
+* React Native owns product experience and cross-platform UI.
+* Native owns platform capabilities, security-sensitive operations, native SDK integrations, and low-level infrastructure.
+
+### Capability Boundary
+
+```text
+React Native
+     │
+     │ Capability API
+     ↓
+Native Capability Layer
+     │
+     ├── Wallet
+     ├── Security
+     ├── Network
+     └── Transaction
+            │
+            ├── MWA
+            ├── Web3j
+            ├── Secure Storage
+            └── RPC
+```
+
+* React Native should not directly depend on platform-specific implementations such as MWA, Android Keystore, Web3j, or Android biometric APIs.
+* Platform capabilities should be exposed through explicit capability interfaces/contracts.
+* RN should depend on capability contracts rather than concrete native implementations.
+* A user-facing feature may span both React Native and native layers, but the same UI should not be implemented twice.
+
+### Boundary Rules
+
+* RN owns product UI and cross-platform interaction.
+* Native owns platform-specific capabilities and security-sensitive operations.
+* Capability APIs define the boundary between RN and native code.
+* RN should depend on capability contracts rather than concrete native implementations.
+* The same UI should not be implemented independently in both RN and native code.
+
 ## React Native Runtime
 
 During development, the React Native side follows this flow:
@@ -166,10 +220,11 @@ Kotlin / Android
       └── Native Capabilities
               │
               ↓
-       Native / RN Bridge
+       Capability API
               │
               ↓
-     React Native UI Layer
+     React Native
+     Experience Layer
 ```
 
 The project deliberately starts with a small, verifiable foundation rather than implementing the entire architecture upfront.
