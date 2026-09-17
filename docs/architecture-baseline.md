@@ -1,6 +1,6 @@
 # Architecture Baseline
 
-- **Status**: Frozen Baseline
+- **Status**: Active Baseline
 - **Scope**: Current Architecture Direction
 - **Purpose**: Architecture reference for subsequent implementation and review
 
