@@ -88,16 +88,9 @@ The Platform API exists solely to allow the RN Application to consume **Native-o
 
 ## 5. Architecture Evolution
 
-This structure is a **Frozen Baseline**, serving as the starting point for implementation. While evolution is permitted, it must follow these principles:
+This structure is an **Active Baseline**, serving as the starting point for implementation. While evolution is permitted, it must follow these principles:
 
 1. **Responsibility First**: Understand the actual responsibility before defining a boundary or directory.
 2. **No Speculative Abstraction**: Do not create directories or interfaces just because they exist in "Standard Clean Architecture" templates. Abstraction must be driven by actual duplication or clear responsibility needs.
 3. **Human Authority**: AI-generated architecture and code must be reviewed and understood by the human engineer. The human engineer must be able to explain every boundary and design trade-off.
 4. **Consistency**: When implementation reveals that the baseline no longer matches actual responsibilities, the architecture must be explicitly reviewed and the baseline updated before the new direction becomes established.
-
-## 6. Engineering Goals
-
-- **Android**: Practice modern engineering with Kotlin, Coroutines, Flow, and Native capability integration.
-- **iOS**: Practice Swift, SwiftUI, Xcode environment, and native platform capabilities.
-- **React Native**: Practice TypeScript, Hooks, State management, Hermes runtime, and Web3 integration.
-- **Engineering Mindset**: Prioritize architectural clarity and "real-world engineering thinking" over raw code volume.
