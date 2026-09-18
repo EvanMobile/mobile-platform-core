@@ -94,3 +94,25 @@ This structure is an **Active Baseline**, serving as the starting point for impl
 2. **No Speculative Abstraction**: Do not create directories or interfaces just because they exist in "Standard Clean Architecture" templates. Abstraction must be driven by actual duplication or clear responsibility needs.
 3. **Human Authority**: AI-generated architecture and code must be reviewed and understood by the human engineer. The human engineer must be able to explain every boundary and design trade-off.
 4. **Consistency**: When implementation reveals that the baseline no longer matches actual responsibilities, the architecture must be explicitly reviewed and the baseline updated before the new direction becomes established.
+
+### 5.1 Platform Extension and Runtime Calibration
+
+1. **Current Implementation Trunk**: The currently validated and implemented path of the project is established as the trunk consisting of the **RN Application** and the **Android Platform Core**. This status represents the current implementation scope and architectural validation status, rather than a permanent prioritization of a single platform.
+2. **Extension Principle**: Additional platforms or runtimes are intended to extend the established architectural trunk, ensuring that established architectural boundaries and the core Application/Feature boundaries be preserved where appropriate rather than requiring a redesign around each new technology. Platform-specific implementations may differ based on their native responsibilities, allowing an additional platform or runtime to introduce a distinct implementation model without becoming a new global architectural owner. Architectural boundaries may still evolve when implementation evidence demonstrates that the current baseline is insufficient.
+3. **Feature-Level Runtime Variation**: A specific feature may utilize an alternative runtime or UI technology when justified by responsibility-driven requirements. For instance, a future feature might be implemented within an isolated **Native Feature Runtime** across an explicit Feature boundary, returning a structured Feature result to the RN Application:
+   ```text
+   RN Application
+       |
+       | explicit Feature boundary
+       v
+   Native Feature Runtime
+       |
+       v
+   structured Feature result
+       |
+       v
+   RN Application
+   ```
+   In such cases, the Native Feature Runtime owns only the responsibilities of that isolated feature (such as its local UI/runtime lifecycle and feature-specific native concerns), while the existing Application / Domain boundaries remain the owner of product-level business composition.
+4. **Intentional Platform Scope Control**: The absence of a complete iOS Platform Core or Flutter Platform Core is an intentional scope control choice rather than an architectural inconsistency. A future extension or additional platform may initially be validated through a focused Feature Slice or an isolated Feature Runtime before a complete platform core is justified. For example, iOS may be validated via a limited number of native Feature Slices, and Flutter may later be evaluated as an isolated Feature Runtime where a specific feature benefits from its characteristics, without promising a full core implementation for either.
+5. **Continuous Calibration**: The architecture remains an Active Baseline that is subject to continuous calibration through implementation and ongoing review, rather than being treated as a final configuration.
