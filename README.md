@@ -1,8 +1,78 @@
 # Mobile Platform Core
 
-A modular mobile foundation for building Web3 applications with **native Android capabilities and React Native UI**.
+A production-oriented mobile foundation for building Web3 applications with **React Native as the application layer** and **native platforms providing platform-specific capabilities**.
 
-The project is currently focused on establishing a clean, runnable foundation first, then incrementally adding security, networking, Web3, and native wallet integrations.
+The project currently focuses on establishing and validating the core mobile architecture through a working **React Native + Android** implementation trunk. Additional security, networking, Web3, wallet, and platform integrations are introduced incrementally as their responsibilities become concrete.
+
+## Architecture
+
+The current implementation trunk is:
+
+```text
+                 Mobile Architecture Trunk
+                           │
+             ┌─────────────┴─────────────┐
+             │                           │
+      RN Application              Android Platform
+             │                           │
+             │                     Platform APIs
+             └──────────────┬────────────┘
+                            │
+                   Native-only capabilities
+```
+
+### RN Application
+
+React Native is the application's primary cross-platform runtime.
+
+It owns:
+
+- Product business logic
+- UI and UX
+- Navigation and application flows
+- Application state
+- Application-level networking
+- Web3 application composition
+
+RN can communicate directly with backend services and blockchain RPC endpoints. Native platform APIs are used when a capability depends on platform-specific functionality.
+
+### Native Platform
+
+Native platform implementations provide capabilities that depend on the operating system, native SDKs, or platform security facilities.
+
+Examples include:
+
+- Secure storage
+- Android Keystore and iOS Keychain
+- Biometric authentication
+- Native wallet protocol integration such as Solana Mobile Wallet Adapter
+- Native WebView capabilities
+- Platform-specific SDK integration
+- Other OS-specific runtime capabilities
+
+Native platforms do not become the owner of product-level application business logic simply because a feature uses native functionality.
+
+### Platform API
+
+The Platform API defines the boundary through which the RN Application consumes native-only capabilities.
+
+```text
+RN Application
+      │
+      │ Platform API
+      ▼
+Native Platform
+      │
+      ├── Security
+      ├── Secure Storage
+      ├── Wallet Integration
+      ├── WebView
+      └── Other Platform Capabilities
+```
+
+The Platform API is not a mandatory gateway for all application networking or business logic. It exists where a feature requires native platform functionality.
+
+---
 
 ## Project Structure
 
@@ -37,118 +107,124 @@ mobile-platform-core/
     └── README.md
 ```
 
-### Why Android and React Native are separated
+The repository keeps the Android native project and React Native project as separate technical roots within a single Git repository.
 
-The repository keeps the **Android native project** and the **React Native project** as separate technical roots while maintaining a single Git repository.
+- `android/` — Android native platform implementation
+- `rn/` — React Native application
+- `ios/` — intentionally scoped future iOS extension
+- `flutter/` — future Flutter runtime extension
 
-- `android/` — Kotlin/Android native layer
-- `rn/` — React Native JavaScript/TypeScript layer
-- `ios/` — future iOS integration placeholder
-- `flutter/` — future Flutter integration placeholder
+This structure keeps application and platform responsibilities explicit without introducing speculative abstractions.
 
-This separation keeps native infrastructure and cross-platform UI concerns explicit without prematurely introducing unnecessary abstractions.
+---
 
-## Current Architecture
+## Android Core
 
-The Android project is organized into independent core modules:
+The Android project currently contains the following core modules:
 
 | Module | Responsibility |
 |---|---|
 | `core:common` | Shared foundational utilities |
 | `core:state` | State-related infrastructure |
-| `core:network` | Network infrastructure boundary |
-| `core:security` | Mobile security boundary |
-| `core:web3` | Web3/blockchain integration boundary |
+| `core:network` | Network infrastructure |
+| `core:security` | Security-related platform infrastructure |
+| `core:web3` | Web3 and blockchain integration |
 | `core:webview` | WebView-related infrastructure |
 | `app` | Android application entry point |
 
-The core modules currently establish **boundaries rather than complete feature implementations**. Functionality will be added incrementally as the project develops.
+These modules currently establish responsibility boundaries rather than representing a complete set of implemented product features.
 
-## Architecture Boundary
+New abstractions and modules are introduced only when actual implementation requirements justify them.
 
-The project strictly separates cross-platform product experience from platform-specific capabilities to prevent duplicated UI implementations and establish clear architectural rules for future development.
+---
 
-### Layer Responsibilities
+## Integration Validation
 
-| React Native / Experience Layer | Native / Platform Layer |
-|---|---|
-| Wallet UI | Solana Mobile Wallet Adapter |
-| Asset and token lists | Android Keystore |
-| Transaction history | Biometric authentication |
-| Send / Receive UI | Secure storage |
-| Network selection UI | Transaction signing |
-| Wallet state presentation | Web3j / EVM integration |
-| Settings and application flows | RPC and network infrastructure |
-| Navigation and design system | Native SDK integrations |
-| Loading / error / empty states | Android lifecycle and platform APIs |
-
-* React Native owns product experience and cross-platform UI.
-* Native owns platform capabilities, security-sensitive operations, native SDK integrations, and low-level infrastructure.
-
-### Capability Boundary
+A minimal React Native → Android native bridge has been implemented to validate the Platform API boundary and the native module integration path.
 
 ```text
 React Native
      │
-     │ Capability API
-     ↓
-Native Capability Layer
+     │ AppBridge.hello()
+     ▼
+Android Native Module
      │
-     ├── Wallet
-     ├── Security
-     ├── Network
-     └── Transaction
-            │
-            ├── MWA
-            ├── Web3j
-            ├── Secure Storage
-            └── RPC
+     │ Promise result
+     ▼
+React Native
 ```
 
-* React Native should not directly depend on platform-specific implementations such as MWA, Android Keystore, Web3j, or Android biometric APIs.
-* Platform capabilities should be exposed through explicit capability interfaces/contracts.
-* RN should depend on capability contracts rather than concrete native implementations.
-* A user-facing feature may span both React Native and native layers, but the same UI should not be implemented twice.
+The current bridge flow is an **integration validation step**, not a product feature.
 
-### Boundary Rules
+It establishes a working foundation for subsequent native capabilities without introducing additional architectural structure prematurely.
 
-* RN owns product UI and cross-platform interaction.
-* Native owns platform-specific capabilities and security-sensitive operations.
-* Capability APIs define the boundary between RN and native code.
-* RN should depend on capability contracts rather than concrete native implementations.
-* The same UI should not be implemented independently in both RN and native code.
+---
 
-## React Native Runtime
+## Web3 Direction
 
-During development, the React Native side follows this flow:
+The application is being developed around a practical Web3 mobile use case.
+
+The intended feature direction includes:
+
+- Wallet connection
+- Authentication and authorization
+- Watchlist data
+- Realtime monitoring of selected assets
+- Profile and session management
+- Secure platform interactions
+- Blockchain RPC and transaction flows
+
+The architecture distinguishes between wallet interaction and blockchain network interaction:
 
 ```text
-App.tsx
-   ↓
-index.js
-   ↓
-AppRegistry
-   ↓
-React Native Runtime
-   ↓
-Metro
-   ↓
-Android application
-   ↓
-Emulator
+Wallet
+├── Connection
+├── Authorization
+└── Signing
+
+Blockchain / Chain
+├── RPC
+├── Network Data
+└── Transaction Broadcasting
 ```
 
-`App.tsx` defines the React Native UI.
+Native wallet protocols such as **Solana Mobile Wallet Adapter (MWA)** belong to the native platform integration boundary when their implementation requires native platform capabilities.
 
-`index.js` registers the root component through `AppRegistry`.
+Application-level blockchain interaction may remain within the RN Application where appropriate.
 
-Metro is the development bundler/server that provides the JavaScript bundle to the React Native runtime during development.
+---
 
-For release builds, the JavaScript bundle is packaged with the application and Metro is not required as a runtime development server.
+## Cross-Platform and Runtime Extensions
+
+The current implementation trunk is intentionally focused on **React Native + Android**.
+
+Additional platforms or runtimes are future extensions of the established architecture rather than separate application architectures.
+
+A specific feature may use a different native or cross-platform runtime when there is a concrete responsibility-driven reason to do so.
+
+For example:
+
+```text
+RN Application
+      │
+      │ explicit Feature boundary
+      ▼
+Feature Runtime
+      │
+      │ structured Feature result
+      ▼
+RN Application
+```
+
+Such a feature runtime remains isolated to the feature that requires it. It does not become a second owner of the application's product business logic.
+
+The `ios/` and `flutter/` directories are intentionally scoped for future extension. A complete iOS or Flutter platform core is not currently claimed or required by the current project scope.
+
+---
 
 ## Current Status
 
-### Foundation
+### Implemented
 
 - [x] Android project structure
 - [x] Modular Android core boundaries
@@ -157,18 +233,23 @@ For release builds, the JavaScript bundle is packaged with the application and M
 - [x] React Native project
 - [x] React Native development environment
 - [x] React Native UI running on Android
-- [x] Native ↔ React Native bridge (Legacy)
+- [x] RN → Android native bridge validation
 
-### In Progress / Planned
+### Current Direction
 
-- [ ] `core:security` implementation
-- [ ] `core:network` implementation
-- [ ] `core:web3` implementation
+- [ ] Security platform capabilities
+- [ ] Application networking
+- [ ] Web3 integration
 - [ ] Solana Mobile Wallet Adapter integration
 - [ ] EVM integration with web3j
-- [ ] Wallet connection and transaction flows
-- [ ] Security-focused mobile capabilities
-- [ ] End-to-end Web3 mobile demonstration
+- [ ] Wallet connection and authorization flows
+- [ ] Watchlist and realtime monitoring
+- [ ] Secure session handling
+- [ ] Transaction flows
+
+These items will be implemented incrementally through concrete features and validation steps rather than by completing the entire architecture upfront.
+
+---
 
 ## Development
 
@@ -185,7 +266,7 @@ cd android
 
 ### React Native
 
-Open the `rn/` directory in VS Code.
+Open the `rn/` directory in your preferred editor.
 
 Install dependencies:
 
@@ -206,27 +287,21 @@ Run the Android application from the React Native project:
 npm run android
 ```
 
-## Project Direction
+During development, Metro provides the JavaScript bundle to the React Native runtime.
 
-The long-term goal is to build a practical **Web3 mobile engineering foundation** around:
+For release builds, the JavaScript bundle is packaged with the application and Metro is not required as a runtime development server.
 
-```text
-Kotlin / Android
-      │
-      ├── Security
-      ├── Network
-      ├── Web3
-      ├── Wallet Integration
-      └── Native Capabilities
-              │
-              ↓
-       Capability API
-              │
-              ↓
-     React Native
-     Experience Layer
-```
+---
 
-The project deliberately starts with a small, verifiable foundation rather than implementing the entire architecture upfront.
+## Engineering Principles
 
-Each major capability should be introduced with runnable code, clear module ownership, and a corresponding validation step.
+The project follows a small set of architectural principles:
+
+- **Responsibility first** — define boundaries according to actual responsibilities.
+- **No speculative abstraction** — introduce abstractions when implementation requirements justify them.
+- **Explicit boundaries** — keep application, feature, and platform responsibilities clear.
+- **Platform independence** — Android and iOS may implement shared semantics differently according to their native environments.
+- **Incremental validation** — introduce major capabilities through runnable code and concrete validation.
+- **Continuous calibration** — the architecture is an Active Baseline and evolves when implementation evidence demonstrates that the current boundaries need adjustment.
+
+The goal is not to implement every platform or abstraction upfront, but to establish a coherent mobile architecture that can be extended without redesigning the application around each new technology.
