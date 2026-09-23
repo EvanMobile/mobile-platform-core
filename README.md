@@ -80,6 +80,16 @@ The Platform API is not a mandatory gateway for all application networking or bu
 mobile-platform-core/
 ├── android/
 │   ├── app/
+│   │   └── src/main/kotlin/com/mobile/platform/
+│   │       ├── bridge/
+│   │       │   ├── AppBridgeModule.kt
+│   │       │   └── AppBridgePackage.kt
+│   │       ├── presentation/
+│   │       │   └── compose/
+│   │       │       ├── FeatureHubActivity.kt
+│   │       │       ├── FeatureHubScreen.kt
+│   │       │       └── NativeRnBridgeActivity.kt
+│   │       └── MobilePlatformApplication.kt
 │   ├── core/
 │   │   ├── common/
 │   │   ├── state/
@@ -95,6 +105,7 @@ mobile-platform-core/
 │
 ├── rn/
 │   ├── src/
+│   │   └── App.tsx
 │   ├── index.js
 │   ├── package.json
 │   └── ...
@@ -114,49 +125,33 @@ The repository keeps the Android native project and React Native project as sepa
 - `ios/` — intentionally scoped future iOS extension
 - `flutter/` — future Flutter runtime extension
 
-This structure keeps application and platform responsibilities explicit without introducing speculative abstractions.
-
 ---
 
-## Android Core
+## Feature Hub & Integration Validation
 
-The Android project currently contains the following core modules:
+The Android host application launches into the **Feature Hub** (`FeatureHubActivity`), a Compose-based feature scheduler displaying active platform capabilities and placeholder feature entries.
 
-| Module | Responsibility |
-|---|---|
-| `core:common` | Shared foundational utilities |
-| `core:state` | State-related infrastructure |
-| `core:network` | Network infrastructure |
-| `core:security` | Security-related platform infrastructure |
-| `core:web3` | Web3 and blockchain integration |
-| `core:webview` | WebView-related infrastructure |
-| `app` | Android application entry point |
-
-These modules currently establish responsibility boundaries rather than representing a complete set of implemented product features.
-
-New abstractions and modules are introduced only when actual implementation requirements justify them.
-
----
-
-## Integration Validation
-
-A minimal React Native → Android native bridge has been implemented to validate the Platform API boundary and the native module integration path.
+Selecting the **Native ↔ RN Bridge** entry launches `NativeRnBridgeActivity`, executing the React Native runtime and validating the Native Module bridge boundary:
 
 ```text
-React Native
+FeatureHubActivity (Compose Hub)
+     │
+     ▼ [Intent]
+NativeRnBridgeActivity (ReactActivity)
+     │
+     ▼
+React Native (rn/src/App.tsx)
      │
      │ AppBridge.hello()
      ▼
-Android Native Module
+Android Native Module (AppBridgeModule)
      │
-     │ Promise result
+     │ Promise result ("Android Native OK")
      ▼
 React Native
 ```
 
-The current bridge flow is an **integration validation step**, not a product feature.
-
-It establishes a working foundation for subsequent native capabilities without introducing additional architectural structure prematurely.
+This flow provides a clear Feature Hub entry while preserving the integration validation bridge.
 
 ---
 
@@ -174,52 +169,6 @@ The intended feature direction includes:
 - Secure platform interactions
 - Blockchain RPC and transaction flows
 
-The architecture distinguishes between wallet interaction and blockchain network interaction:
-
-```text
-Wallet
-├── Connection
-├── Authorization
-└── Signing
-
-Blockchain / Chain
-├── RPC
-├── Network Data
-└── Transaction Broadcasting
-```
-
-Native wallet protocols such as **Solana Mobile Wallet Adapter (MWA)** belong to the native platform integration boundary when their implementation requires native platform capabilities.
-
-Application-level blockchain interaction may remain within the RN Application where appropriate.
-
----
-
-## Cross-Platform and Runtime Extensions
-
-The current implementation trunk is intentionally focused on **React Native + Android**.
-
-Additional platforms or runtimes are future extensions of the established architecture rather than separate application architectures.
-
-A specific feature may use a different native or cross-platform runtime when there is a concrete responsibility-driven reason to do so.
-
-For example:
-
-```text
-RN Application
-      │
-      │ explicit Feature boundary
-      ▼
-Feature Runtime
-      │
-      │ structured Feature result
-      ▼
-RN Application
-```
-
-Such a feature runtime remains isolated to the feature that requires it. It does not become a second owner of the application's product business logic.
-
-The `ios/` and `flutter/` directories are intentionally scoped for future extension. A complete iOS or Flutter platform core is not currently claimed or required by the current project scope.
-
 ---
 
 ## Current Status
@@ -228,12 +177,13 @@ The `ios/` and `flutter/` directories are intentionally scoped for future extens
 
 - [x] Android project structure
 - [x] Modular Android core boundaries
-- [x] Android single-activity application
+- [x] Android Feature Hub (`FeatureHubActivity` & `FeatureHubScreen`)
+- [x] Native ↔ RN Bridge entry (`NativeRnBridgeActivity`)
 - [x] Android build and emulator validation
 - [x] React Native project
 - [x] React Native development environment
 - [x] React Native UI running on Android
-- [x] RN → Android native bridge validation
+- [x] RN → Android native bridge validation (`AppBridge.hello()`)
 
 ### Current Direction
 
@@ -246,8 +196,6 @@ The `ios/` and `flutter/` directories are intentionally scoped for future extens
 - [ ] Watchlist and realtime monitoring
 - [ ] Secure session handling
 - [ ] Transaction flows
-
-These items will be implemented incrementally through concrete features and validation steps rather than by completing the entire architecture upfront.
 
 ---
 
@@ -287,10 +235,6 @@ Run the Android application from the React Native project:
 npm run android
 ```
 
-During development, Metro provides the JavaScript bundle to the React Native runtime.
-
-For release builds, the JavaScript bundle is packaged with the application and Metro is not required as a runtime development server.
-
 ---
 
 ## Engineering Principles
@@ -303,5 +247,3 @@ The project follows a small set of architectural principles:
 - **Platform independence** — Android and iOS may implement shared semantics differently according to their native environments.
 - **Incremental validation** — introduce major capabilities through runnable code and concrete validation.
 - **Continuous calibration** — the architecture is an Active Baseline and evolves when implementation evidence demonstrates that the current boundaries need adjustment.
-
-The goal is not to implement every platform or abstraction upfront, but to establish a coherent mobile architecture that can be extended without redesigning the application around each new technology.

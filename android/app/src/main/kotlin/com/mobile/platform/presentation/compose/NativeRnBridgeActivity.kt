@@ -1,4 +1,4 @@
-package com.mobile.platform
+package com.mobile.platform.presentation.compose
 
 import android.os.Bundle
 import com.facebook.react.ReactActivity
@@ -6,7 +6,7 @@ import com.facebook.react.ReactActivityDelegate
 import com.facebook.react.config.ReactFeatureFlags
 import com.facebook.react.defaults.DefaultReactActivityDelegate
 
-class MainActivity : ReactActivity() {
+class NativeRnBridgeActivity : ReactActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         ReactFeatureFlags.enableBridgelessArchitecture = false
