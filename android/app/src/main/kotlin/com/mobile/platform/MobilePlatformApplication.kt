@@ -19,7 +19,8 @@ class MobilePlatformApplication : Application(), ReactApplication {
             override fun getPackages(): List<ReactPackage> =
                 listOf(
                     MainReactPackage(),
-                    AppBridgePackage()
+                    AppBridgePackage(),
+                    com.horcrux.svg.SvgPackage()
                 )
 
             override fun getJSMainModuleName(): String = "index"

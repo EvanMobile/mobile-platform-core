@@ -46,7 +46,7 @@ private val featureItems = listOf(
         id = "watchlist",
         title = "RN Watchlist",
         description = "Asset watchlist and tracking features",
-        isActive = false
+        isActive = true
     ),
     FeatureItem(
         id = "biometric",
@@ -128,7 +128,7 @@ fun FeatureHubScreen(
                         FeatureCardItem(
                             item = item,
                             onClick = {
-                                if (item.isActive && item.id == "bridge") {
+                                if (item.isActive) {
                                     onLaunchNativeRnBridge()
                                 }
                             }

@@ -72,6 +72,7 @@ dependencies {
     implementation(libs.react.native)
     implementation(libs.hermes.engine)
     coreLibraryDesugaring(libs.desugar.jdk.libs)
+    implementation(project(":react-native-svg"))
     implementation(project(":core:common"))
     implementation(project(":core:state"))
     implementation(project(":core:network"))

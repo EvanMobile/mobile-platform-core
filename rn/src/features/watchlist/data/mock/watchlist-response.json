@@ -1,0 +1,41 @@
+{
+  "status": "success",
+  "timestamp": 1727840400000,
+  "data": {
+    "accountValueUsd": 100000.00,
+    "assets": [
+      {
+        "id": "asset-btc",
+        "symbol": "BTC",
+        "name": "Bitcoin",
+        "balance": 1.0,
+        "priceUsd": 60000.00,
+        "change24hPercent": 3.50
+      },
+      {
+        "id": "asset-eth",
+        "symbol": "ETH",
+        "name": "Ethereum",
+        "balance": 10.0,
+        "priceUsd": 3000.00,
+        "change24hPercent": -1.20
+      },
+      {
+        "id": "asset-sol",
+        "symbol": "SOL",
+        "name": "Solana",
+        "balance": 50.0,
+        "priceUsd": 150.00,
+        "change24hPercent": 5.40
+      },
+      {
+        "id": "asset-usdc",
+        "symbol": "USDC",
+        "name": "USD Coin",
+        "balance": 2500.0,
+        "priceUsd": 1.00,
+        "change24hPercent": 0.00
+      }
+    ]
+  }
+}

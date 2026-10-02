@@ -21,6 +21,8 @@ dependencyResolutionManagement {
 rootProject.name = "mobile-platform-core"
 
 include(":app")
+include(":react-native-svg")
+project(":react-native-svg").projectDir = file("../rn/node_modules/react-native-svg/android")
 include(":core:common")
 include(":core:state")
 include(":core:network")
