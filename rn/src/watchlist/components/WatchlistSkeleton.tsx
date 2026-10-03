@@ -4,21 +4,17 @@ import {StyleSheet, View} from 'react-native';
 export const WatchlistSkeleton: React.FC = () => {
   return (
     <View style={styles.container}>
-      {/* Header Skeleton */}
       <View style={styles.headerBlock} />
       <View style={styles.subtitleBlock} />
 
-      {/* Summary Card Skeleton */}
       <View style={styles.cardSkeleton}>
         <View style={styles.labelBlock} />
         <View style={styles.balanceBlock} />
         <View style={styles.badgeBlock} />
       </View>
 
-      {/* Donut Chart Skeleton */}
       <View style={styles.chartSkeleton} />
 
-      {/* List Rows Skeleton */}
       {[1, 2, 3, 4].map((key) => (
         <View key={key} style={styles.rowSkeleton}>
           <View style={styles.circleBlock} />

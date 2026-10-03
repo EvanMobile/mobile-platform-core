@@ -36,6 +36,8 @@ It owns:
 
 RN can communicate directly with backend services and blockchain RPC endpoints. Native platform APIs are used when a capability depends on platform-specific functionality.
 
+When an isolated feature or capability requires its own entry point, it is structured as an **Independent RN Application Boundary** (`BridgeRoot`, `WatchlistRoot`, etc.) with its own composition, router, and screens.
+
 ### Native Platform
 
 Native platform implementations provide capabilities that depend on the operating system, native SDKs, or platform security facilities.
@@ -88,7 +90,8 @@ mobile-platform-core/
 │   │       │   └── compose/
 │   │       │       ├── FeatureHubActivity.kt
 │   │       │       ├── FeatureHubScreen.kt
-│   │       │       └── NativeRnBridgeActivity.kt
+│   │       │       ├── BridgeActivity.kt
+│   │       │       └── WatchlistActivity.kt
 │   │       └── MobilePlatformApplication.kt
 │   ├── core/
 │   │   ├── common/
@@ -105,7 +108,8 @@ mobile-platform-core/
 │
 ├── rn/
 │   ├── src/
-│   │   └── App.tsx
+│   │   ├── bridge/         # Card #001 Bridge Application Boundary
+│   │   └── watchlist/      # Card #002 Watchlist Application Boundary
 │   ├── index.js
 │   ├── package.json
 │   └── ...
@@ -131,27 +135,25 @@ The repository keeps the Android native project and React Native project as sepa
 
 The Android host application launches into the **Feature Hub** (`FeatureHubActivity`), a Compose-based feature scheduler displaying active platform capabilities and placeholder feature entries.
 
-Selecting the **Native ↔ RN Bridge** entry launches `NativeRnBridgeActivity`, executing the React Native runtime and validating the Native Module bridge boundary:
+Selecting an active feature launches its corresponding host `ReactActivity`, executing the React Native runtime for that **Independent RN Application Boundary**:
 
 ```text
 FeatureHubActivity (Compose Hub)
      │
-     ▼ [Intent]
-NativeRnBridgeActivity (ReactActivity)
+     ├── [Intent] Native ↔ RN Bridge
+     │      ▼
+     │  BridgeActivity -> BridgeRoot ("BridgeRoot") -> BridgeTestScreen
+     │      │
+     │      │ AppBridge.hello()
+     │      ▼
+     │  Android Native Module (AppBridgeModule) -> "Android Native OK"
      │
-     ▼
-React Native (rn/src/App.tsx)
-     │
-     │ AppBridge.hello()
-     ▼
-Android Native Module (AppBridgeModule)
-     │
-     │ Promise result ("Android Native OK")
-     ▼
-React Native
+     └── [Intent] RN Watchlist
+            ▼
+        WatchlistActivity -> WatchlistRoot ("WatchlistRoot") -> WatchlistScreen
 ```
 
-This flow provides a clear Feature Hub entry while preserving the integration validation bridge.
+This flow provides a clear Feature Hub entry while preserving clean RN Application boundaries.
 
 ---
 
@@ -178,24 +180,17 @@ The intended feature direction includes:
 - [x] Android project structure
 - [x] Modular Android core boundaries
 - [x] Android Feature Hub (`FeatureHubActivity` & `FeatureHubScreen`)
-- [x] Native ↔ RN Bridge entry (`NativeRnBridgeActivity`)
-- [x] Android build and emulator validation
-- [x] React Native project
-- [x] React Native development environment
-- [x] React Native UI running on Android
-- [x] RN → Android native bridge validation (`AppBridge.hello()`)
-
-### Current Direction
-
-- [ ] Security platform capabilities
-- [ ] Application networking
-- [ ] Web3 integration
-- [ ] Solana Mobile Wallet Adapter integration
-- [ ] EVM integration with web3j
-- [ ] Wallet connection and authorization flows
-- [ ] Watchlist and realtime monitoring
-- [ ] Secure session handling
-- [ ] Transaction flows
+- [x] RN Application Boundaries (`BridgeActivity` & `WatchlistActivity`)
+- [x] React Native 0.74.5 Application Setup
+- [x] Android Host Application for RN
+- [x] RN Page Rendering on Android
+- [x] Metro Development Integration
+- [x] Legacy RN Bridge Configuration
+- [x] RN → Android Native Asynchronous Call
+- [x] Android → RN Promise Result
+- [x] `AppBridgeModule` Registration and Invocation
+- [x] Architecture Baseline Established
+- [x] Current Implementation Trunk Established
 
 ---
 

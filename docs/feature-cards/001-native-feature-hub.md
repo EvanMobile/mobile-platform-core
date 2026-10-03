@@ -1,9 +1,11 @@
 # Feature Card #001: Feature Hub
 
-- **Status**: Completed
+- **Status**: Completed (Updated for RN Application Boundary)
 - **Target Component**: Android Platform (`:app`)
 - **Primary Class**: `com.mobile.platform.presentation.compose.FeatureHubActivity`
-- **Related Entry**: `com.mobile.platform.presentation.compose.NativeRnBridgeActivity`
+- **Related Entries**: 
+  - `com.mobile.platform.presentation.compose.BridgeActivity` -> `"BridgeRoot"`
+  - `com.mobile.platform.presentation.compose.WatchlistActivity` -> `"WatchlistRoot"`
 
 ---
 
@@ -26,18 +28,34 @@ FeatureHubActivity (MAIN / LAUNCHER)
         ├── Native ↔ RN Bridge (Active)
         │       │
         │       ▼ [Intent]
-        │   NativeRnBridgeActivity (ReactActivity)
+        │   BridgeActivity (ReactActivity)
+        │       │
+        │       ▼ getMainComponentName()
+        │   "BridgeRoot"
+        │       │
+        │       ▼ AppRegistry.registerComponent
+        │   rn/src/bridge/BridgeRoot.tsx
         │       │
         │       ▼
-        │   React Native Runtime (rn/src/App.tsx)
+        │   BridgeApp.tsx -> AppRouter.tsx -> BridgeTestScreen.tsx
         │       │
-        │       ▼
-        │   AppBridge.hello()
-        │       │
-        │       ▼
+        │       ▼ AppBridge.hello()
         │   "Android Native OK"
         │
-        ├── RN Watchlist        (Coming Soon)
+        ├── RN Watchlist (Active)
+        │       │
+        │       ▼ [Intent]
+        │   WatchlistActivity (ReactActivity)
+        │       │
+        │       ▼ getMainComponentName()
+        │   "WatchlistRoot"
+        │       │
+        │       ▼ AppRegistry.registerComponent
+        │   rn/src/watchlist/WatchlistRoot.tsx
+        │       │
+        │       ▼
+        │   WatchlistApp.tsx -> AppRouter.tsx -> WatchlistScreen.tsx
+        │
         ├── Biometric           (Coming Soon)
         ├── Secure Storage      (Coming Soon)
         ├── WebView             (Coming Soon)
@@ -51,24 +69,26 @@ FeatureHubActivity (MAIN / LAUNCHER)
    - Registered in `AndroidManifest.xml` with `MAIN` and `LAUNCHER` intent filters.
    - Renders `FeatureHubScreen` via Jetpack Compose `setContent {}`.
    - Title: **Mobile Platform**, Subtitle: **Feature Hub**.
-   - Handles simple Android `Intent` navigation to `NativeRnBridgeActivity`.
+   - Handles explicit Android `Intent` navigation to `BridgeActivity` or `WatchlistActivity`.
 
-2. **`NativeRnBridgeActivity`** (`ReactActivity`)
-   - Relocated directly from old `MainActivity`.
-   - Hosts the React Native container (`MobilePlatform`).
+2. **`BridgeActivity`** (`ReactActivity`)
+   - Hosts the React Native container for Bridge Capability (`"BridgeRoot"`).
    - Retains all React Native runtime setup, lifecycle delegates, and `AppBridgePackage` bindings.
 
-3. **Package Placement**
-   - Both activities and the screen composable reside in `com.mobile.platform.presentation.compose`.
+3. **`WatchlistActivity`** (`ReactActivity`)
+   - Hosts the React Native container for Watchlist Feature (`"WatchlistRoot"`).
+
+4. **Package Placement**
+   - Activities and the screen composable reside in `com.mobile.platform.presentation.compose`.
 
 ---
 
 ## 3. Existing Bridge Preservation
 
-The Native ↔ RN Bridge implementation is strictly preserved and relocated without redesign:
+The Native ↔ RN Bridge implementation is strictly preserved:
 - `AppBridgeModule.kt` continues to handle `AppBridge.hello()`.
 - Promise resolution returns `"Android Native OK"`.
-- `rn/src/App.tsx` retains the **Call Android Native** action button.
+- `rn/src/bridge/screens/BridgeTestScreen.tsx` retains the **Call Android Native** action button.
 - "Android Native OK" serves as the concrete, non-mocked integration verification result for the Native ↔ RN Bridge capability.
 
 ---
@@ -77,20 +97,18 @@ The Native ↔ RN Bridge implementation is strictly preserved and relocated with
 
 | Feature | Status | Action / Target |
 |---|---|---|
-| Native ↔ RN Bridge | Active | Launches `NativeRnBridgeActivity` |
-| RN Watchlist | Coming Soon | Placeholder |
+| Native ↔ RN Bridge | Active | Launches `BridgeActivity` ("BridgeRoot") |
+| RN Watchlist | Active | Launches `WatchlistActivity` ("WatchlistRoot") |
 | Biometric | Coming Soon | Placeholder |
 | Secure Storage | Coming Soon | Placeholder |
 | WebView | Coming Soon | Placeholder |
 | Web3 Wallet | Coming Soon | Placeholder |
 | Realtime Monitor | Coming Soon | Placeholder |
 
-No speculative code, ViewModels, DI modules, or empty feature packages were created for the placeholder entries.
-
 ---
 
 ## 5. Verification Results
 
 - **Build Verification**: `./gradlew :app:assembleDebug` executed successfully.
-- **Runtime Navigation**: `FeatureHubActivity` -> `NativeRnBridgeActivity` via native Intent.
+- **Runtime Navigation**: `FeatureHubActivity` -> `BridgeActivity` / `WatchlistActivity` via native Intent.
 - **Bridge Verification**: `AppBridge.hello()` successfully returns `"Android Native OK"`.

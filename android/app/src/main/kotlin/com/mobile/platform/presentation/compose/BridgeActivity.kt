@@ -6,7 +6,7 @@ import com.facebook.react.ReactActivityDelegate
 import com.facebook.react.config.ReactFeatureFlags
 import com.facebook.react.defaults.DefaultReactActivityDelegate
 
-class NativeRnBridgeActivity : ReactActivity() {
+class BridgeActivity : ReactActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         ReactFeatureFlags.enableBridgelessArchitecture = false
@@ -14,10 +14,9 @@ class NativeRnBridgeActivity : ReactActivity() {
     }
 
     /**
-     * Returns the name of the main component registered from JavaScript. This is used to schedule
-     * rendering of the component.
+     * Returns the name of the main component registered from JavaScript.
      */
-    override fun getMainComponentName(): String = "MobilePlatform"
+    override fun getMainComponentName(): String = "BridgeRoot"
 
     override fun createReactActivityDelegate(): ReactActivityDelegate =
         DefaultReactActivityDelegate(this, mainComponentName, false)

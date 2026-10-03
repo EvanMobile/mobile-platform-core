@@ -55,7 +55,6 @@ export function useWatchlist(): UseWatchlistReturn {
         const repository = new WatchlistRepository(dataSource);
         const result = await repository.getWatchlist();
 
-        // Async race protection: Ignore response if a newer request was issued
         if (currentRequestId !== requestIdRef.current) {
           return;
         }
@@ -72,7 +71,6 @@ export function useWatchlist(): UseWatchlistReturn {
         const errorMessage =
           err instanceof Error ? err.message : 'Failed to fetch watchlist';
 
-        // If existing asset data is displayed on screen, preserve existing data
         if (assetsRef.current.length > 0) {
           setError(errorMessage);
           setStatus('success');

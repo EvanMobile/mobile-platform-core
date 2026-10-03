@@ -11,8 +11,11 @@ class FeatureHubActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             FeatureHubScreen(
-                onLaunchNativeRnBridge = {
-                    startActivity(Intent(this, NativeRnBridgeActivity::class.java))
+                onLaunchBridge = {
+                    startActivity(Intent(this, BridgeActivity::class.java))
+                },
+                onLaunchWatchlist = {
+                    startActivity(Intent(this, WatchlistActivity::class.java))
                 }
             )
         }

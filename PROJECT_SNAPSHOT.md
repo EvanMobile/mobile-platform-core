@@ -6,11 +6,11 @@
 - **当前分支**: `main`
 - **当前 HEAD**: `4a133a1` — `docs: evolve architecture baseline for platform extensions`
 - **当前实现主干 (Current Implementation Trunk)**:
-  - React Native Application
+  - React Native Application (Independent RN Application Boundaries)
   - Android Platform Core (Feature Hub + Native Platform Capabilities)
 - **仓库状态**: 当前仓库已经形成 RN + Android 的实际实现主干。iOS 和 Flutter 目前仅保留仓库级占位目录，暂不属于当前实现范围。
 - **架构状态**: Architecture Baseline 已建立，并随着实际实现持续校准。
-- **Web3 功能状态**: 当前尚未实现完整的 Web3 产品功能。
+- **Web3 功能状态**: 当前已完成 Card #001 (Native Bridge Capability) 与 Card #002 (RN Watchlist Application)。
 - **文档定位**: 本文件用于记录当前工程状态，帮助在不同开发阶段恢复项目上下文。源代码和 Git 历史仍然是最终事实依据；本文件属于随工程状态变化而更新的 Snapshot。
 
 ---
@@ -30,7 +30,8 @@ mobile-platform-core/
 │   │           │   └── compose/     # Feature Hub & Presentation
 │   │           │       ├── FeatureHubActivity.kt
 │   │           │       ├── FeatureHubScreen.kt
-│   │           │       └── NativeRnBridgeActivity.kt
+│   │           │       ├── BridgeActivity.kt
+│   │           │       └── WatchlistActivity.kt
 │   │           └── MobilePlatformApplication.kt
 │   ├── core/                        # Android Platform Core Modules
 │   │   ├── common/
@@ -44,10 +45,23 @@ mobile-platform-core/
 │   └── gradle/
 │       └── libs.versions.toml
 │
-├── rn/                              # React Native Application
+├── rn/                              # React Native Application Layer
 │   ├── src/
-│   │   └── App.tsx
-│   ├── index.js
+│   │   ├── bridge/                  # Card #001 Bridge Application Boundary
+│   │   │   ├── BridgeRoot.tsx
+│   │   │   ├── BridgeApp.tsx
+│   │   │   ├── navigation/
+│   │   │   └── screens/
+│   │   └── watchlist/               # Card #002 Watchlist Application Boundary
+│   │       ├── WatchlistRoot.tsx
+│   │       ├── WatchlistApp.tsx
+│   │       ├── navigation/
+│   │       ├── screens/
+│   │       ├── components/
+│   │       ├── data/
+│   │       ├── hooks/
+│   │       └── model/
+│   ├── index.js                     # AppRegistry component registrations
 │   └── package.json
 │
 ├── ios/                             # Repository-level iOS Placeholder
@@ -58,7 +72,8 @@ mobile-platform-core/
 │
 ├── docs/
 │   ├── feature-cards/
-│   │   └── 001-native-feature-hub.md
+│   │   ├── 001-native-feature-hub.md
+│   │   └── 002-rn-watchlist.md
 │   └── architecture-baseline.md
 │
 ├── PROJECT_SNAPSHOT.md              # Current Engineering State
@@ -92,15 +107,12 @@ mobile-platform-core/
 
 RN 当前承担 Application Layer。
 
-主要负责：
+每个独立功能/应用入口通过 **Independent RN Application Boundary** 暴露给 Native Host：
 
-- Application UI
-- Application-level interaction
-- Product / business flows
-- Web3 application experience
-- 通过 Platform API 使用必要的 native-only capabilities
+- `BridgeRoot`: Card #001 Bridge capability validation application.
+- `WatchlistRoot`: Card #002 Watchlist feature application.
 
-RN 不直接承担 Android wallet protocol、Android security primitive、secure storage 等平台特定实现。
+每个 RN Application 在其 Boundary 内拥有完整的组成结构（Root Component -> App Composition -> Navigation / Router -> Screens）。
 
 ### Native Platform
 
@@ -109,15 +121,12 @@ Android 当前承担 Native Platform Layer，并通过 Compose Feature Hub (`Fea
 平台侧承载：
 
 - Feature Hub (`FeatureHubActivity`)
-- Native ↔ RN Bridge Entry (`NativeRnBridgeActivity`)
+- Bridge Application Host (`BridgeActivity`)
+- Watchlist Application Host (`WatchlistActivity`)
 - Secure Storage 与 Android Security primitives
 - Biometric authentication
 - Wallet protocol integration
 - WebView / JSBridge
-- 必要的 native networking / RPC infrastructure
-- 其他平台特定能力
-
-这些能力在需要跨越平台边界时，通过明确的 **Platform API** 暴露给 Application Layer。
 
 ---
 
@@ -150,20 +159,7 @@ Android 当前承担 Native Platform Layer，并通过 Compose Feature Hub (`Fea
 
 ---
 
-## 5. Android Core Modules
-
-| Module | 当前状态 | 预期职责 |
-|---|---|---|
-| `:core:common` | Skeleton | Shared foundational types / utilities |
-| `:core:state` | Skeleton | Application / platform state infrastructure |
-| `:core:network` | Skeleton | Network / RPC-related infrastructure |
-| `:core:security` | Skeleton | Security / secure platform primitives |
-| `:core:web3` | Skeleton | Web3 protocol / blockchain integration |
-| `:core:webview` | Skeleton | WebView / related native integration |
-
----
-
-## 6. React Native Integration
+## 5. React Native Integration
 
 Android 当前作为 React Native Application 的 Host。
 
@@ -171,27 +167,21 @@ Android 当前作为 React Native Application 的 Host。
 
 ```text id="7ap4j8"
 rn/index.js
-    ↓
-AppRegistry.registerComponent(...)
-    ↓
-rn/src/App.tsx
+    ├── AppRegistry.registerComponent('BridgeRoot', () => BridgeRoot)
+    └── AppRegistry.registerComponent('WatchlistRoot', () => WatchlistRoot)
 ```
 
 ### Android Host
 
 ```text id="2k3x6n"
 FeatureHubActivity (Compose Hub)
-    ↓
-NativeRnBridgeActivity (ReactActivity)
-    ↓
-MobilePlatformApplication
-    ↓
-React Native Runtime
+    ├── [Intent] -> BridgeActivity -> "BridgeRoot" -> BridgeRoot.tsx
+    └── [Intent] -> WatchlistActivity -> "WatchlistRoot" -> WatchlistRoot.tsx
 ```
 
 ---
 
-## 7. RN ↔ Android Native Integration
+## 6. RN ↔ Android Native Integration
 
 ### Native Module
 
@@ -216,9 +206,9 @@ Android Native OK
 ```text
 FeatureHubActivity
       ↓ (Intent)
-NativeRnBridgeActivity
+BridgeActivity ("BridgeRoot")
       ↓
-rn/src/App.tsx
+rn/src/bridge/screens/BridgeTestScreen.tsx
       ↓
 AppBridge.hello()
       ↓
@@ -227,23 +217,13 @@ AppBridge.hello()
 
 ---
 
-## 8. Web3 依赖与实现状态 (Web3 Status)
-
-### EVM
-- `web3j-core: 4.11.0` 已声明
-
-### Solana
-- `solana-mwa: 2.0.0` 已声明
-
----
-
-## 9. 已实现功能 (Implemented)
+## 7. 已实现功能 (Implemented)
 
 ### 已确认
 
 - [x] Android Multi-module Project Structure
 - [x] Feature Hub Entry (`FeatureHubActivity` & `FeatureHubScreen`)
-- [x] Native ↔ RN Bridge Feature Entry (`NativeRnBridgeActivity`)
+- [x] RN Application Boundaries (`BridgeActivity` -> `"BridgeRoot"` & `WatchlistActivity` -> `"WatchlistRoot"`)
 - [x] React Native 0.74.5 Application Setup
 - [x] Android Host Application for RN
 - [x] RN Page Rendering on Android
@@ -252,10 +232,11 @@ AppBridge.hello()
 - [x] RN → Android Native Asynchronous Call
 - [x] Android → RN Promise Result
 - [x] `AppBridgeModule` Registration and Invocation
+- [x] Card #002 RN Watchlist Feature Application
 - [x] Architecture Baseline Established
 - [x] Current Implementation Trunk Established
 
 ---
 
-**Last verified:** 2026-09-24  
+**Last verified:** 2026-10-04  
 **Architecture status:** Active Baseline Established

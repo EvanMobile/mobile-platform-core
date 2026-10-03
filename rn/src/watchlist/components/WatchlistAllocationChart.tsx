@@ -22,18 +22,16 @@ function getAssetColor(symbol: string, index: number): string {
   return fallbackColors[index % fallbackColors.length];
 }
 
-// SVG Circle Geometry Constants
 const SVG_SIZE = 100;
 const RADIUS = 40;
 const STROKE_WIDTH = 18;
-const CIRCUMFERENCE = 2 * Math.PI * RADIUS; // ~251.327
+const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 
 export const WatchlistAllocationChart: React.FC<Props> = ({assets}) => {
   if (!assets || assets.length === 0) {
     return null;
   }
 
-  // Calculate SVG stroke dasharray and offset for each asset slice
   let cumulativeOffset = 0;
   const slices = assets.map((asset, index) => {
     const dashLength = (asset.allocationPercent / 100) * CIRCUMFERENCE;
@@ -53,7 +51,6 @@ export const WatchlistAllocationChart: React.FC<Props> = ({assets}) => {
       <Text style={styles.title}>Asset Allocation</Text>
 
       <View style={styles.contentRow}>
-        {/* SVG Vector Donut Ring */}
         <View style={styles.donutContainer}>
           <Svg width={SVG_SIZE} height={SVG_SIZE} viewBox={`0 0 ${SVG_SIZE} ${SVG_SIZE}`}>
             <G origin={`${SVG_SIZE / 2}, ${SVG_SIZE / 2}`} rotation={-90}>
@@ -74,14 +71,12 @@ export const WatchlistAllocationChart: React.FC<Props> = ({assets}) => {
             </G>
           </Svg>
 
-          {/* Center Cutout Summary Overlay */}
           <View style={styles.donutCenterHole}>
             <Text style={styles.holeText}>{assets.length}</Text>
             <Text style={styles.holeSubtext}>Assets</Text>
           </View>
         </View>
 
-        {/* Percentage Legend Grid */}
         <View style={styles.legendContainer}>
           {slices.map((slice) => (
             <View key={slice.id} style={styles.legendItem}>

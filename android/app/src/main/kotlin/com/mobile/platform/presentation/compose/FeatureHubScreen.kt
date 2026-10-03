@@ -90,7 +90,8 @@ private val HubDarkColorScheme = darkColorScheme(
 
 @Composable
 fun FeatureHubScreen(
-    onLaunchNativeRnBridge: () -> Unit
+    onLaunchBridge: () -> Unit,
+    onLaunchWatchlist: () -> Unit
 ) {
     MaterialTheme(colorScheme = HubDarkColorScheme) {
         Surface(
@@ -129,7 +130,10 @@ fun FeatureHubScreen(
                             item = item,
                             onClick = {
                                 if (item.isActive) {
-                                    onLaunchNativeRnBridge()
+                                    when (item.id) {
+                                        "bridge" -> onLaunchBridge()
+                                        "watchlist" -> onLaunchWatchlist()
+                                    }
                                 }
                             }
                         )
